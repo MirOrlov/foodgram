@@ -1,0 +1,38 @@
+volumes:
+  pg_data:
+  static_volume:
+  media_volume:
+
+# Всё отличие — заменяем build на image и указываем, какой образ использовать
+services:
+  db:
+    image: postgres:14.8-bullseye
+    restart: always
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+  backend:
+    image: mirorlov/foodgram_backend
+    volumes:
+      - static_volume:/app/static/
+      - media_volume:/app/media/
+    depends_on:
+      - db
+    env_file:
+      - ./.env
+  frontend:
+    image: mirorlov/foodgram_frontend
+    command: cp -r /app/build/. /static/
+    volumes:
+      - static_volume:/static
+  gateway:
+    image: mirorlov/foodgram_gateway
+    restart: always
+    ports:
+      - 8000:80
+    volumes:
+      - static_volume:/static/
+      - media_volume:/var/html/media/
+    depends_on:
+      - frontend
