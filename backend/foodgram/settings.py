@@ -26,11 +26,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
-
     "recipes.apps.RecipesConfig",
     "api.apps.ApiConfig",
 ]
@@ -108,19 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-DJOSER = {
-    'LOGIN_FIELD': 'email',
-    'SERIALIZERS': {
-        'user_create': 'api.serializers.UserRegistrationSerializer',
-        'user': 'api.serializers.UserSerializer',
-        'current_user': 'api.serializers.UserSerializer',
-    },
-    'PERMISSIONS': {
-        'user': ['rest_framework.permissions.IsAuthenticated'],
-        'user_list': ['rest_framework.permissions.AllowAny'],
-    }
-}
-
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS":
         "rest_framework.pagination.LimitOffsetPagination",
@@ -136,9 +121,25 @@ REST_FRAMEWORK = {
     ),
 }
 
-LANGUAGE_CODE = "ru-ru"
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'SERIALIZERS': {
+        'user_create': 'djoser.serializers.UserCreateSerializer',
+        'user': 'api.serializers.UserSerializer',
+        'current_user': 'api.serializers.UserSerializer',
+    },
+    'PERMISSIONS': {
+        'user': ['rest_framework.permissions.IsAuthenticated'],
+        'user_list': ['rest_framework.permissions.AllowAny'],
+    }
+}
+
+LANGUAGE_CODE = "ru-RU"
+
 TIME_ZONE = "Europe/Moscow"
+
 USE_I18N = True
+
 USE_TZ = True
 
 MEDIA_URL = "/media/"
@@ -146,22 +147,5 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "collected_static"
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-MAX_RECIPE_NAME = 256
-MAX_TAG_NAME = 256
-MAX_INGREDIENT_NAME = 128
-MAX_MEASUREMENT_NAME = 64
-LIST_PER_PAGE = 20
-MAX_WIDTH_SIZE = 500
-MAX_HEIGHT_SIZE = 500
-MIN_COOKING_TIME = 1
-MAX_PAGE_SIZE = 100
-MAX_USER_NAME = 150
-PAGE_SIZE = 6
-MIN_AMOUNT = 1
-
-
-FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
-DATA_UPLOAD_MAX_NUMBER_FIELDS = 20 * 1024 * 1024

@@ -3,7 +3,6 @@ volumes:
   static_volume:
   media_volume:
 
-# Всё отличие — заменяем build на image и указываем, какой образ использовать
 services:
   db:
     image: postgres:14.8-bullseye
