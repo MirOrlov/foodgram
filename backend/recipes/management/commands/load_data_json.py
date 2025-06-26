@@ -34,14 +34,17 @@ class Command(BaseCommand):
                 )
 
             self.stdout.write(
-                self.style.SUCCESS(f'Успешно загружено {len(created)} ингредиентов {file_path}')
+                self.style.SUCCESS(f'Успешно загружено {len(created)}\
+                                    ингредиентов {file_path}')
             )
 
         except FileNotFoundError:
             self.stdout.write(self.style.ERROR(f'Файл не найден: {file_path}'))
         except json.JSONDecodeError:
-            self.stdout.write(self.style.ERROR(f'Неправильный формат {file_path}'))
+            self.stdout.write(self.style.ERROR(
+                f'Неправильный формат {file_path}'))
         except KeyError as e:
-            self.stdout.write(self.style.ERROR(f'Пропущено обязательное поле: {e}'))
+            self.stdout.write(self.style.ERROR(
+                f'Пропущено обязательное поле: {e}'))
         except Exception as e:
             self.stdout.write(self.style.ERROR(f'Ошибка: {e}'))

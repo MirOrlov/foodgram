@@ -17,7 +17,7 @@ class IngredientSearchFilter(df_filters.FilterSet):
 
 
 class CustomRecipeFilter(df_filters.FilterSet):
-    """Расширенный фильтр для рецептов 
+    """Расширенный фильтр для рецептов
     с поддержкой избранного и списка покупок"""
 
     is_in_shopping_cart = df_filters.BooleanFilter(
