@@ -235,7 +235,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             'image',
         )
         if not tags:
-            raise serializers.ValidationError({'tags': 'Поле tags не может быть пустым'})
+            raise serializers.ValidationError(
+                {'tags': 'Поле tags не может быть пустым'})
         tag_ids = [tag.id for tag in tags]
         if len(tag_ids) != len(set(tag_ids)):
             raise serializers.ValidationError(
