@@ -46,7 +46,7 @@ class UserSerializer(DjoserUserSerializer):
         read_only_fields = ['id', 'is_subscribed']
 
     def get_is_subscribed(self, obj):
-        """Проверяет, подписан ли текущий пользователь на данного пользователя."""
+        """Проверяет, подписку текущего пользователя на пользователя."""
         request = self.context.get("request")
         return (request and request.user.is_authenticated
                 and request.user.subscriptions
