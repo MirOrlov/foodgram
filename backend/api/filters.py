@@ -17,8 +17,8 @@ class IngredientSearchFilter(df_filters.FilterSet):
 
 
 class CustomRecipeFilter(df_filters.FilterSet):
-    """Расширенный фильтр для рецептов
-    с поддержкой избранного и списка покупок"""
+    """Расширенный фильтр для рецептов с поддержкой
+    избранного и списка покупок"""
 
     is_in_shopping_cart = df_filters.BooleanFilter(
         method='filter_shopping_cart'
@@ -56,7 +56,7 @@ class CustomRecipeFilter(df_filters.FilterSet):
         """Фильтрация рецептов в списке покупок пользователя"""
         return self._apply_user_filter(
             queryset,
-            "in_shopping_carts__user",
+            "shopping_carts__user",
             value
         )
 

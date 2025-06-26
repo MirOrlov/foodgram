@@ -1,7 +1,7 @@
-# admin.py
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import mark_safe
+from django.db.models import Count
 
 from recipes.models import (
     User, Tag, Ingredient,
@@ -12,16 +12,38 @@ from recipes.models import (
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name')
+    list_display = ('username', 'email', 'first_name', 'last_name',
+                    'recipes_count', 'subscribers_count')
     search_fields = ('username', 'email')
     list_filter = ('is_staff', 'is_superuser')
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Личные данные', {
-            'fields': ('first_name', 'last_name', 'email', 'avatar')}),
-        ('Права', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+            'fields': ('first_name', 'last_name', 'email', 'avatar')
+        }),
+        ('Права', {
+            'fields': ('is_active', 'is_staff', 'is_superuser')
+        }),
     )
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        queryset = queryset.annotate(
+            _recipes_count=Count('recipes', distinct=True),
+            _subscribers_count=Count('subscribers', distinct=True),
+        )
+        return queryset
+
+    def recipes_count(self, obj):
+        return obj._recipes_count
+    recipes_count.admin_order_field = '_recipes_count'
+    recipes_count.short_description = 'Рецепты'
+
+    def subscribers_count(self, obj):
+        return obj._subscribers_count
+    subscribers_count.admin_order_field = '_subscribers_count'
+    subscribers_count.short_description = 'Подписчики'
 
 
 @admin.register(Tag)
@@ -40,21 +62,34 @@ class IngredientAdmin(admin.ModelAdmin):
 class RecipeIngredientInline(admin.TabularInline):
     model = RecipeIngredient
     extra = 1
+    min_num = 1
 
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author', 'cooking_time')
+    list_display = ('name', 'author', 'cooking_time', 'favorites_count')
     search_fields = ('name', 'author__username')
     list_filter = ('tags',)
     inlines = (RecipeIngredientInline,)
 
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        queryset = queryset.annotate(
+            _favorites_count=Count('favorites', distinct=True),
+        )
+        return queryset
+
+    @admin.display(description='Изображение')
     def image_preview(self, obj):
         if obj.image:
             return mark_safe(f'<img src="{obj.image.url}" width="100" />')
         return "-"
 
-    image_preview.short_description = 'Изображение'
+    @admin.display(description='В избранном')
+    def favorites_count(self, obj):
+        return obj._favorites_count
+    favorites_count.admin_order_field = '_favorites_count'
+
     readonly_fields = ('image_preview',)
 
 

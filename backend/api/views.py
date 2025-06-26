@@ -38,6 +38,8 @@ from api.serializers import (
     UserSubscriptionSerializer,
     RecipeShortSerializer,
     TagSerializer,
+    FavoriteSerializer,
+    ShoppingCartSerializer
 )
 
 
@@ -58,10 +60,8 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     """
     Вьюсет для работы с рецептами.
-    Поддерживает
-    создание, просмотр, редактирование и удаление рецептов,
-    а также дополнительные действия:
-    избранное, список покупок и скачивание списка.
+    Поддерживает создание, просмотр, редактирование и удаление рецептов,
+    и дополнительные действия: избранное, список покупок, скачивание списка.
     """
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
@@ -77,6 +77,40 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Автоматически устанавливает автора при создании рецепта."""
         serializer.save(author=self.request.user)
 
+    @staticmethod
+    def _add_relation(request, pk, serializer_class, model, relation_name):
+        """Общий метод для добавления связи (избранное/корзина)."""
+        recipe = get_object_or_404(Recipe, id=pk)
+
+        serializer = serializer_class(
+            data={'recipe': recipe.id},
+            context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return response.Response(
+            RecipeShortSerializer(recipe, context={'request': request}).data,
+            status=status.HTTP_201_CREATED
+        )
+
+    @staticmethod
+    def _remove_relation(request, pk, model):
+        """Общий метод для удаления связи (избранное/корзина)."""
+        recipe = get_object_or_404(Recipe, pk=pk)
+        deleted_count, _ = model.objects.filter(
+            user=request.user,
+            recipe=recipe
+        ).delete()
+
+        if deleted_count == 0:
+            return response.Response(
+                {'errors': f'Рецепт не найден в {model._meta.verbose_name}'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
+
     @decorators.action(
         detail=True,
         methods=["post"],
@@ -84,39 +118,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=[permissions.IsAuthenticated],
     )
     def favorite(self, request, pk=None):
-        """Добавляет рецепт в избранное для текущего пользователя."""
-        recipe = get_object_or_404(Recipe, id=pk)
-        user = request.user
-
-        favorite_relation, created = Favorite.objects.get_or_create(
-            user=user, recipe=recipe)
-
-        if not created:
-            return response.Response(
-                {"errors": f"Рецепт '{recipe.name}' уже в избранном"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        serializer = RecipeShortSerializer(
-            recipe, context={'request': request})
-        return response.Response(
-            serializer.data, status=status.HTTP_201_CREATED)
+        return self._add_relation(
+            request, pk, FavoriteSerializer, Favorite, 'избранном'
+        )
 
     @favorite.mapping.delete
     def remove_from_favorite(self, request, pk=None):
-        """Удаляет рецепт из избранного текущего пользователя."""
-        recipe = get_object_or_404(Recipe, pk=pk)
-        favorite_relation = Favorite.objects.filter(
-            user=request.user, recipe=recipe)
-
-        if not favorite_relation.exists():
-            return response.Response(
-                {'errors': 'Рецепт не найден в избранном'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        favorite_relation.delete()
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
+        return self._remove_relation(request, pk, Favorite)
 
     @decorators.action(
         detail=True,
@@ -125,39 +133,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=[permissions.IsAuthenticated],
     )
     def shopping_cart(self, request, pk=None):
-        """Добавляет рецепт в список покупок текущего пользователя."""
-        recipe = get_object_or_404(Recipe, id=pk)
-        user = request.user
-
-        cart_relation, created = ShoppingCart.objects.get_or_create(
-            user=user, recipe=recipe)
-
-        if not created:
-            return response.Response(
-                {"errors": f"Рецепт '{recipe.name}' уже в списке покупок"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        serializer = RecipeShortSerializer(
-            recipe, context={'request': request})
-        return response.Response(
-            serializer.data, status=status.HTTP_201_CREATED)
+        return self._add_relation(
+            request, pk, ShoppingCartSerializer, ShoppingCart, 'корзине'
+        )
 
     @shopping_cart.mapping.delete
     def remove_from_shopping_cart(self, request, pk=None):
-        """Удаляет рецепт из списка покупок текущего пользователя."""
-        recipe = get_object_or_404(Recipe, pk=pk)
-        cart_relation = ShoppingCart.objects.filter(
-            user=request.user, recipe=recipe)
-
-        if not cart_relation.exists():
-            return response.Response(
-                {'errors': 'Рецепт не найден в списке покупок'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        cart_relation.delete()
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
+        return self._remove_relation(request, pk, ShoppingCart)
 
     @decorators.action(
         detail=True,
@@ -187,7 +169,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         для всех рецептов в корзине пользователя.
         """
         recipes = Recipe.objects.filter(
-            in_shopping_carts__user=request.user
+            shopping_carts__user=request.user
         ).prefetch_related('recipe_ingredients__ingredient', 'author')
 
         ingredients = (
@@ -253,22 +235,12 @@ class UserViewSet(DjoserUserViewSet):
 
     @decorators.action(
         detail=False,
-        methods=["put", "delete"],
+        methods=["put"],
         permission_classes=[permissions.IsAuthenticated],
         url_path="me/avatar",
     )
-    def manage_avatar(self, request, *args, **kwargs):
-        """
-        Управление аватаром пользователя:
-        - PUT: загружает новый аватар
-        - DELETE: удаляет текущий аватар
-        """
-        if request.method == "PUT":
-            return self._upload_avatar(request)
-        return self._delete_avatar(request.user)
-
-    def _upload_avatar(self, request):
-        """Загружает новый аватар для пользователя"""
+    def upload_avatar(self, request, *args, **kwargs):
+        """Загружает новый аватар для текущего пользователя."""
         serializer = AvatarSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -280,14 +252,36 @@ class UserViewSet(DjoserUserViewSet):
             status=status.HTTP_200_OK
         )
 
-    def _delete_avatar(self, user):
-        """Удаляет аватар пользователя"""
-        if user.avatar:
-            if default_storage.exists(user.avatar.name):
-                default_storage.delete(user.avatar.name)
+    @upload_avatar.mapping.delete
+    def delete_avatar(self, request, *args, **kwargs):
+        """Полностью удаляет аватар пользователя с диска и из БД"""
+        user = request.user
+
+        if not user.avatar:
+            return response.Response(
+                {'detail': 'Аватар не найден'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Получаем путь к файлу до удаления
+        avatar_path = user.avatar.path
+
+        try:
+            # Удаляем файл с диска
+            if default_storage.exists(avatar_path):
+                default_storage.delete(avatar_path)
+
+            # Обновляем запись в БД
             user.avatar = None
             user.save()
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+            return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+        except Exception as e:
+            return response.Response(
+                {'detail': f'Ошибка при удалении аватара: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @decorators.action(
         detail=True,
