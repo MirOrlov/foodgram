@@ -11,7 +11,6 @@ from recipes.models import (
     Recipe,
     RecipeIngredient,
     Ingredient,
-    User,
     Tag,
 )
 
@@ -49,10 +48,10 @@ class UserSerializer(DjoserUserSerializer):
     def get_is_subscribed(self, obj):
         """Проверяет, подписан ли текущий пользователь на данного пользователя."""
         request = self.context.get("request")
-        return (
-                request and request.user.is_authenticated
-                and request.user.subscriptions.filter(subscribed_to=obj).exists()
-        )
+        return (request and request.user.is_authenticated
+                and request.user.subscriptions
+                .filter(subscribed_to=obj).exists()
+                )
 
 
 class UserSubscriptionSerializer(UserSerializer):
@@ -166,27 +165,27 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         if request.method == 'POST':
             if (
-                    'image' not in self.initial_data or
-                    not self.initial_data.get('image')
+                    'image' not in self.initial_data or not self
+                    .initial_data.get('image')
             ):
                 raise serializers.ValidationError(
                     {"image":
-                         ["Изображение должно быть заполненно"]
+                        ["Изображение должно быть заполненно"]
                      }
                 )
         elif request.method in ['PATCH', 'PUT']:
             if (
-                    'image' in self.initial_data and
-                    not self.initial_data.get('image')
+                    'image' in self.initial_data and not self
+                    .initial_data.get('image')
             ):
                 raise serializers.ValidationError(
                     {"image":
-                         ["Изображение не должно быть пустым"]
+                        ["Изображение не должно быть пустым"]
                      }
                 )
             if (
-                    'ingredients' not in self.initial_data or
-                    not self.initial_data.get('ingredients')
+                    'ingredients' not in self.initial_data or not self
+                    .initial_data.get('ingredients')
             ):
                 raise serializers.ValidationError(
                     {"ingredients": ["Ингридиенты должны быть заполненны"]}
@@ -202,24 +201,23 @@ class RecipeSerializer(serializers.ModelSerializer):
             )
         ingredient_ids = [ing["ingredient"]["id"] for ing in ingredients]
         if len(ingredient_ids) != len(set(ingredient_ids)):
-            raise serializers.ValidationError("Ингридиенты должны быть без дубликатов")
+            raise serializers.ValidationError(
+                "Ингридиенты должны быть без дубликатов")
         return ingredients
 
     def get_is_favorited(self, obj):
         """Проверяет, добавлен ли рецепт в избранное."""
         request = self.context.get("request")
-        return (
-                request and request.user.is_authenticated
+        return (request and request.user.is_authenticated
                 and obj.favorites.filter(user=request.user).exists()
-        )
+                )
 
     def get_is_in_shopping_cart(self, obj):
         """Проверяет, добавлен ли рецепт в список покупок."""
         request = self.context.get("request")
-        return (
-                request and request.user.is_authenticated
+        return (request and request.user.is_authenticated
                 and obj.in_shopping_carts.filter(user=request.user).exists()
-        )
+                )
 
     def create(self, validated_data):
         """Создает новый рецепт с ингредиентами и тегами."""
@@ -263,4 +261,3 @@ class RecipeSerializer(serializers.ModelSerializer):
         ])
 
         return instance
-

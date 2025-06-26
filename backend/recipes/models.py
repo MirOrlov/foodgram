@@ -171,7 +171,8 @@ class RecipeIngredient(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.ingredient.name} - {self.amount} {self.ingredient.measurement_unit}"
+        return f"{self.ingredient.name} - {self.amount}\
+              {self.ingredient.measurement_unit}"
 
 
 class Subscription(models.Model):
@@ -205,7 +206,8 @@ class Subscription(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.user.username} подписан на {self.subscribed_to.username}"
+        return f"{self.user.username} подписан на \
+        {self.subscribed_to.username}"
 
 
 class Favorite(models.Model):
@@ -266,3 +268,4 @@ class ShoppingCart(models.Model):
 
     def __str__(self):
         return f"Корзина {self.user.username}: {self.recipe.name}"
+    

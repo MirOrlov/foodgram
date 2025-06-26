@@ -9,7 +9,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import Lower
 from rest_framework import (
     decorators,
-    filters,
     permissions,
     status,
     viewsets,
@@ -59,8 +58,10 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     """
     Вьюсет для работы с рецептами.
-    Поддерживает создание, просмотр, редактирование и удаление рецептов,
-    а также дополнительные действия: избранное, список покупок и скачивание списка.
+    Поддерживает
+    создание, просмотр, редактирование и удаление рецептов,
+    а также дополнительные действия:
+    избранное, список покупок и скачивание списка.
     """
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
@@ -197,7 +198,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
         report_content = [
-            f"Список покупок",
+            "Список покупок",
             f"Дата составления: {datetime.now().strftime('%d.%m.%Y %H:%M')}",
             f"Всего рецептов: {len(recipes)}",
             f"Всего ингредиентов: {len(ingredients)}",
@@ -313,7 +314,8 @@ class UserViewSet(DjoserUserViewSet):
         )
         if not created:
             return response.Response(
-                {'errors': f'Вы уже подписаны на пользователя {author.username}.'},
+                {'errors':
+                 f'Вы уже подписаны на пользователя {author.username}.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         data = UserSubscriptionSerializer(
