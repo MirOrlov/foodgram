@@ -4,9 +4,9 @@
 ## Описание проекта  
 Foodgram — это платформа для публикации рецептов с возможностью подписки на авторов, создания списка покупок и добавления рецептов в избранное.  
 
- **Работающий сайт**: [https://MirOrlov](https://MirOrlov)
+ **Работающий сайт**: [https://clowerlover.redirectme.net](https://clowerlover.redirectme.net)
 
- **Автор**: [Ваше ФИО](https://github.com/MirOrlov)  
+ **Автор**: [Мирон Орлов](https://github.com/MirOrlov)  
 
 ## Технологический стек  
 
