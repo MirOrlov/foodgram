@@ -13,11 +13,7 @@ ALLOWED_HOSTS = config(
     default="localhost",
     cast=lambda v: [s.strip() for s in v.split(",")]
 )
-CSRF_TRUSTED_ORIGINS = config(
-    "CSRF_TRUSTED_ORIGINS",
-    default="",
-    cast=lambda v: [s.strip() for s in v.split(",") if s.strip()],
-)
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -73,14 +69,14 @@ WSGI_APPLICATION = "foodgram.wsgi.application"
 # }
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME", "postgres"),
-        "USER": config("POSTGRES_USER", "postgres"),
-        "PASSWORD": config("POSTGRES_PASSWORD", "postgres"),
-        "HOST": config("DB_HOST", "db"),
-        "PORT": config("DB_PORT", default=5432, cast=int),
-    },
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('POSTGRES_DB', 'db_name'),
+        'USER': config('POSTGRES_USER', 'db_user'),
+        'PASSWORD': config('POSTGRES_PASSWORD', 'db_pass'),
+        'HOST': config('DB_HOST', 'db'),
+        'PORT': '5432',
+    }
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -142,10 +138,12 @@ USE_I18N = True
 
 USE_TZ = True
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
 
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "collected_static"
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = 'media'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+CSRF_TRUSTED_ORIGINS = ['http://84.201.138.4', 'http://*']
