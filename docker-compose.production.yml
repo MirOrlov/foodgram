@@ -2,7 +2,7 @@ version: '3.3'
 services:
   frontend:
     container_name: foodgram_frontend
-    image: mirorlov/foodgram_frontend:latest
+    image: mirorlov/foodgram_frontend
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -30,7 +30,7 @@ services:
 
   backend:
     container_name: foodgram_backend
-    image: mirorlov/foodgram_backend:latest
+    image: mirorlov/foodgram_backend
     command: >
       sh -c 'python manage.py migrate &&
              python manage.py collectstatic --noinput &&
