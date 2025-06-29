@@ -1,51 +1,16 @@
+version: '3.3'
 services:
   frontend:
     container_name: foodgram_frontend
-    image: mirorlov/foodgram_frontend
+    image: mirorlov/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
-    networks:
-      - foodgram-network
-
-  db:
-    container_name: foodgram_db
-    image: postgres:14
-    env_file:
-      - .env
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - foodgram-network
-
-  backend:
-    container_name: foodgram_backend
-    image: mirorlov/foodgram_backend
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py collectstatic --noinput &&
-             gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000"
-    volumes:
-      - ../backend/:/app/
-      - static_volume:/app/static/
-      - media_volume:/app/media/
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - foodgram-network
 
   nginx:
-    container_name: foodgram_gateway
+    container_name: foodgram_nginx
     image: nginx:1.25.4-alpine
     ports:
-      - "80:80"
+      - '80:80'
     depends_on:
       - backend
     volumes:
@@ -54,14 +19,31 @@ services:
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static_volume:/var/html/static/
       - media_volume:/var/html/media/
-    networks:
-      - foodgram-network
+
+  db:
+      container_name: foodgram_db
+      image: postgres:14
+      env_file:
+      - .env
+      volumes:
+        - postgres_data:/var/lib/postgresql/data/
+
+  backend:
+    container_name: foodgram_backend
+    image: mirorlov/foodgram_backend:latest
+    command: >
+      sh -c 'python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000'
+    volumes:
+      - static_volume:/app/static/
+      - media_volume:/app/media/
+    env_file:
+      - .env
+    depends_on:
+      - db
 
 volumes:
   postgres_data:
   static_volume:
   media_volume:
-
-networks:
-  foodgram-network:
-    driver: bridge
