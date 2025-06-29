@@ -13,7 +13,7 @@ from recipes.models import (
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name',
-                    'recipes_count', 'subscribers_count')
+                   'recipes_count', 'subscribers_count')
     search_fields = ('username', 'email')
     list_filter = ('is_staff', 'is_superuser')
 

@@ -10,10 +10,11 @@ from recipes.models import (
     Recipe,
     RecipeIngredient,
     Ingredient,
+    User,
     Tag,
     Favorite,
-    ShoppingCart,
-    Subscription,
+ShoppingCart,
+Subscription,
 )
 
 
@@ -44,12 +45,12 @@ class UserSerializer(DjoserUserSerializer):
         read_only_fields = ('id', 'is_subscribed')
 
     def get_is_subscribed(self, obj):
-        """Проверяет, подписан ли пользователь на данного пользователя."""
+        """Проверяет, подписан ли текущий пользователь на данного пользователя."""
         request = self.context.get("request")
-        return (request and request.user.is_authenticated
-                and request.user.subscriptions
-                .filter(subscribed_to=obj).exists()
-                )
+        return (
+                request and request.user.is_authenticated
+                and request.user.subscriptions.filter(subscribed_to=obj).exists()
+        )
 
 
 class UserSubscriptionSerializer(UserSerializer):
@@ -96,7 +97,6 @@ class UserSubscriptionSerializer(UserSerializer):
             )
 
         return data
-
 
 class FavoriteSerializer(serializers.ModelSerializer):
     """Сериализатор для добавления рецепта в избранное."""
@@ -235,8 +235,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'image',
         )
         if not tags:
-            raise serializers.ValidationError(
-                {'tags': 'Поле tags не может быть пустым'})
+            raise serializers.ValidationError({'tags': 'Поле tags не может быть пустым'})
         tag_ids = [tag.id for tag in tags]
         if len(tag_ids) != len(set(tag_ids)):
             raise serializers.ValidationError(
@@ -296,13 +295,15 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         """Проверяет, добавлен ли рецепт в избранное."""
         request = self.context.get("request")
-        return (request and request.user.is_authenticated
+        return (
+                request and request.user.is_authenticated
                 and obj.favorites.filter(user=request.user).exists()
-                )
+        )
 
     def get_is_in_shopping_cart(self, obj):
         """Проверяет, добавлен ли рецепт в список покупок."""
         request = self.context.get("request")
-        return (request and request.user.is_authenticated
+        return (
+                request and request.user.is_authenticated
                 and obj.shopping_carts.filter(user=request.user).exists()
-                )
+        )

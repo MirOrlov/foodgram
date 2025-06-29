@@ -20,8 +20,7 @@ class Command(BaseCommand):
                 self._show_success_message(saved_count, csv_file_path)
 
         except FileNotFoundError:
-            self._show_error_message(
-                f'Отсутствует файл данных: {csv_file_path}')
+            self._show_error_message(f'Отсутствует файл данных: {csv_file_path}')
         except Exception as error:
             self._show_error_message(f'Произошла ошибка: {error}')
 

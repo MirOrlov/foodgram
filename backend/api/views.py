@@ -9,6 +9,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import Lower
 from rest_framework import (
     decorators,
+    filters,
     permissions,
     status,
     viewsets,
@@ -39,7 +40,7 @@ from api.serializers import (
     RecipeShortSerializer,
     TagSerializer,
     FavoriteSerializer,
-    ShoppingCartSerializer
+ShoppingCartSerializer
 )
 
 
@@ -61,7 +62,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """
     Вьюсет для работы с рецептами.
     Поддерживает создание, просмотр, редактирование и удаление рецептов,
-    и дополнительные действия: избранное, список покупок, скачивание списка.
+    а также дополнительные действия: избранное, список покупок и скачивание списка.
     """
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
@@ -141,11 +142,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def remove_from_shopping_cart(self, request, pk=None):
         return self._remove_relation(request, pk, ShoppingCart)
 
+
     @decorators.action(
-        detail=True,
-        methods=["get"],
-        url_path="get-link"
-    )
+            detail=True,
+            methods=["get"],
+            url_path="get-link"
+        )
     def link(self, request, pk=None):
         """
         Генерирует короткую ссылку на рецепт.
@@ -180,7 +182,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
         report_content = [
-            "Список покупок",
+            f"Список покупок",
             f"Дата составления: {datetime.now().strftime('%d.%m.%Y %H:%M')}",
             f"Всего рецептов: {len(recipes)}",
             f"Всего ингредиентов: {len(ingredients)}",
@@ -308,8 +310,7 @@ class UserViewSet(DjoserUserViewSet):
         )
         if not created:
             return response.Response(
-                {'errors':
-                 f'Вы уже подписаны на пользователя {author.username}.'},
+                {'errors': f'Вы уже подписаны на пользователя {author.username}.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         data = UserSubscriptionSerializer(
@@ -341,7 +342,6 @@ class UserViewSet(DjoserUserViewSet):
         queryset = User.objects.filter(subscribers__user=user)
         pages = self.paginate_queryset(queryset)
         serializer = UserSubscriptionSerializer(
-            pages, many=True,
-            context={"request": request}
+            pages, many=True, context={"request": request}
         )
         return self.get_paginated_response(serializer.data)
