@@ -2,7 +2,7 @@ version: '3.3'
 services:
   frontend:
     container_name: foodgram-frontend
-    image: doonyanikitin/foodgram_frontend:latest
+    image: mirorlov/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -30,9 +30,11 @@ services:
 
   backend:
     container_name: foodgram-backend
-    image: doonyanikitin/foodgram_backend:latest
+    image: mirorlov/foodgram_backend:latest
     command: >
-      sh -c 'gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000'
+      sh -c 'python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000'
     volumes:
       - static_volume:/app/static/
       - media_volume:/app/media/
