@@ -21,7 +21,7 @@ services:
       - media_volume:/var/html/media/
 
   db:
-      container_name: foodgram-db
+      container_name: db
       image: postgres:14
       env_file:
       - .env
