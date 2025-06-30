@@ -205,7 +205,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         many=True,
         write_only=True,
     )
-    image = Base64ImageField(required=False, allow_null=True)
+    image = Base64ImageField(required=True, allow_null=False)
     cooking_time = serializers.IntegerField(
         validators=[MinValueValidator(consts.MIN_COOKING_TIME)]
     )
