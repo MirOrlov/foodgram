@@ -234,9 +234,12 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         tags = data.get('tags', [])
         ingredients = data.get('recipe_ingredients', [])
-        image = data.get(
-            'image',
-        )
+        if self.context['request'].method != 'PATCH':
+            image = data.get('image')
+            if not image:
+                raise serializers.ValidationError(
+                    {'image': 'Изображение обязательно при создании рецепта'}
+                )
         if not tags:
             raise serializers.ValidationError(
                 {'tags': 'Поле tags не может быть пустым'}
@@ -257,11 +260,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'tags': 'Дублирование не применимо.'}
             )
-        if not image:
-            raise serializers.ValidationError(
-                {'image': 'Изображение нельзя оставить пустым'}
-            )
-
         return data
 
     @staticmethod
