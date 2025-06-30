@@ -21,6 +21,11 @@ services:
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static_volume:/var/html/static/
       - media_volume:/var/html/media/
+      - /etc/letsencrypt/live/malonymclaren.sytes.net:/etc/letsencrypt/live/malonymclaren.sytes.net:ro
+      - /etc/letsencrypt/archive/malonymclaren.sytes.net:/etc/letsencrypt/archive/malonymclaren.sytes.net:ro
+      - /etc/letsencrypt/renewal:/etc/letsencrypt/renewal:ro
+      - /etc/letsencrypt/options-ssl-nginx.conf:/etc/letsencrypt/options-ssl-nginx.conf:ro
+      - /etc/letsencrypt/ssl-dhparams.pem:/etc/letsencrypt/ssl-dhparams.pem:ro
 
   db:
       container_name: db
