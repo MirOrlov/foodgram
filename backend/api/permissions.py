@@ -14,6 +14,6 @@ class IsAuthorOrReadOnly(BasePermission):
     def has_object_permission(self, request, view, obj):
         """Проверка разрешений для конкретного объекта"""
         return (
-            request.method in SAFE_METHODS or
-            obj.author == request.user
+            request.method in SAFE_METHODS
+            or obj.author == request.user
         )

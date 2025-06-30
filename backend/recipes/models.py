@@ -170,7 +170,10 @@ class RecipeIngredient(models.Model):
         default_related_name = "recipe_ingredients"
 
     def __str__(self):
-        return f"{self.ingredient.name} - {self.amount} {self.ingredient.measurement_unit}"
+        return (
+            f"{self.ingredient.name} - {self.amount} "
+            f"{self.ingredient.measurement_unit}"
+        )
 
 
 class UserRecipeRelation(models.Model):
@@ -226,7 +229,10 @@ class Subscription(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.user.username} подписан на {self.subscribed_to.username}"
+        return (
+            f"{self.user.username} подписан на "
+            f"{self.subscribed_to.username}"
+        )
 
 
 class Favorite(UserRecipeRelation):

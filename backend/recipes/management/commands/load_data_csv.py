@@ -10,17 +10,17 @@ class Command(BaseCommand):
 
     def execute_command(self):
         """Основная логика выполнения команды"""
-        csv_file_path = 'data/ingredients.csv'
+        p = 'data/ingredients.csv'
 
         try:
-            with open(csv_file_path, mode='r', encoding='UTF-8') as file:
+            with open(p, mode='r', encoding='UTF-8') as file:
                 food_items = self._prepare_food_items(file)
                 saved_count = self._save_to_database(food_items)
 
-                self._show_success_message(saved_count, csv_file_path)
+                self._show_success_message(saved_count, p)
 
         except FileNotFoundError:
-            self._show_error_message(f'Отсутствует файл данных: {csv_file_path}')
+            self._show_error_message(f'Отсутствует файл данных: {p}')
         except Exception as error:
             self._show_error_message(f'Произошла ошибка: {error}')
 

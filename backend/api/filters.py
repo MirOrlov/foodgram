@@ -17,12 +17,12 @@ class IngredientSearchFilter(df_filters.FilterSet):
 
 
 class CustomRecipeFilter(df_filters.FilterSet):
-    """Расширенный фильтр для рецептов с поддержкой избранного и списка покупок"""
+    """Расширенный фильтр для рецептов с поддержкой избранного"""
 
     is_in_shopping_cart = df_filters.BooleanFilter(
         method='filter_shopping_cart'
     )
-    is_favorited  = df_filters.BooleanFilter(
+    is_favorited = df_filters.BooleanFilter(
         method='filter_favorites'
     )
     tags = df_filters.ModelMultipleChoiceFilter(

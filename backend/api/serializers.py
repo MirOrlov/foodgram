@@ -10,7 +10,6 @@ from recipes.models import (
     Recipe,
     RecipeIngredient,
     Ingredient,
-    User,
     Tag,
     Favorite,
     ShoppingCart,
@@ -45,11 +44,14 @@ class UserSerializer(DjoserUserSerializer):
         read_only_fields = ('id', 'is_subscribed')
 
     def get_is_subscribed(self, obj):
-        """Проверяет, подписан ли текущий пользователь на данного пользователя."""
+        """
+        Проверяет, подписан ли текущий пользователь
+        на данного пользователя.
+        """
         request = self.context.get("request")
         return (
-                request and request.user.is_authenticated
-                and request.user.subscriptions.filter(subscribed_to=obj).exists()
+            request and request.user.is_authenticated
+            and request.user.subscriptions.filter(subscribed_to=obj).exists()
         )
 
 
@@ -88,7 +90,10 @@ class UserSubscriptionSerializer(UserSerializer):
                 {'subscribed_to': 'Нельзя подписаться на самого себя'}
             )
 
-        if Subscription.objects.filter(user=user, subscribed_to=author).exists():
+        if Subscription.objects.filter(
+            user=user,
+            subscribed_to=author
+        ).exists():
             raise serializers.ValidationError(
                 {'subscribed_to': 'Вы уже подписаны на этого пользователя'}
             )
@@ -102,6 +107,7 @@ class FavoriteShoppingCartSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ('user', 'recipe')
+
 
 class FavoriteSerializer(FavoriteShoppingCartSerializer):
     """Сериализатор для добавления рецепта в избранное."""
@@ -232,7 +238,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             'image',
         )
         if not tags:
-            raise serializers.ValidationError({'tags': 'Поле tags не может быть пустым'})
+            raise serializers.ValidationError(
+                {'tags': 'Поле tags не может быть пустым'}
+            )
         tag_ids = [tag.id for tag in tags]
         if len(tag_ids) != len(set(tag_ids)):
             raise serializers.ValidationError(
@@ -293,14 +301,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         """Проверяет, добавлен ли рецепт в избранное."""
         request = self.context.get("request")
         return (
-                request and request.user.is_authenticated
-                and obj.favorites.filter(user=request.user).exists()
+            request and request.user.is_authenticated
+            and obj.favorites.filter(user=request.user).exists()
         )
 
     def get_is_in_shopping_cart(self, obj):
         """Проверяет, добавлен ли рецепт в список покупок."""
         request = self.context.get("request")
         return (
-                request and request.user.is_authenticated
-                and obj.shopping_carts.filter(user=request.user).exists()
+            request and request.user.is_authenticated
+            and obj.shopping_carts.filter(user=request.user).exists()
         )

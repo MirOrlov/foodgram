@@ -152,5 +152,3 @@ CSRF_TRUSTED_ORIGINS = ['https://84.201.138.4', 'https://*', 'https://malonymcla
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20 МБ
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20 МБ
-
-

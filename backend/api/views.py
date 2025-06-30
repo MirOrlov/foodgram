@@ -7,10 +7,8 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import Lower
-from django.core.exceptions import ValidationError
 from rest_framework import (
     decorators,
-    filters,
     permissions,
     status,
     viewsets,
@@ -63,7 +61,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """
     Вьюсет для работы с рецептами.
     Поддерживает создание, просмотр, редактирование и удаление рецептов,
-    а также дополнительные действия: избранное, список покупок и скачивание списка.
+    а также дополнительные действия: избранное, список покупок
+    и скачивание списка.
     """
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
@@ -182,7 +181,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
         report_content = [
-            f"Список покупок",
+            "Список покупок",
             f"Дата составления: {datetime.now().strftime('%d.%m.%Y %H:%M')}",
             f"Всего рецептов: {len(recipes)}",
             f"Всего ингредиентов: {len(ingredients)}",
