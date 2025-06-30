@@ -29,7 +29,7 @@ services:
         - postgres_data:/var/lib/postgresql/data/
 
   backend:
-    container_name: foodgram-backend
+    container_name: backend
     image: mirorlov/foodgram_backend:latest
     command: >
       sh -c 'python manage.py migrate &&
