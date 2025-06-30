@@ -134,9 +134,17 @@ TIME_ZONE = "Europe/Moscow"
 USE_I18N = True
 USE_TZ = True
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+ALLOWED_HOSTS = ['malonymclaren.sytes.net']
+
+CSRF_TRUSTED_ORIGINS = ['https://malonymclaren.sytes.net']
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / 'static"
+STATIC_ROOT = BASE_DIR / "static"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = "media"
 
