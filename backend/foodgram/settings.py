@@ -8,7 +8,7 @@ SECRET_KEY = config("SECRET_KEY")
 
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*", "malonymclaren.sytes.net"]
 
 
 INSTALLED_APPS = [
@@ -133,13 +133,20 @@ TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
 
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+CSRF_TRUSTED_ORIGINS = ["https://malonymclaren.sytes.net"]
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
 USE_TZ = True
 
 
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = 'media'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / 'static"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
