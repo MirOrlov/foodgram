@@ -133,8 +133,6 @@ TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
 
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
 CSRF_TRUSTED_ORIGINS = ["https://malonymclaren.sytes.net"]
 
 CSRF_COOKIE_SECURE = True
