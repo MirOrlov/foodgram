@@ -4,7 +4,7 @@
 ## Описание проекта  
 Foodgram — это платформа для публикации рецептов с возможностью подписки на авторов, создания списка покупок и добавления рецептов в избранное.  
 
- **Работающий сайт**: [https://clowerlover.redirectme.net](https://clowerlover.redirectme.net)
+ **Работающий сайт**: [http://malonymclaren.sytes.net](http://malonymclaren.sytes.net)
 
  **Автор**: [Мирон Орлов](https://github.com/MirOrlov)  
 
@@ -80,7 +80,7 @@ Foodgram — это платформа для публикации рецепт�
    docker-compose exec backend python manage.py loaddata fixtures.json  
    ```  
 
-9. Сервер будет доступен по адресу: [http://clowerlover.redirectme.net](http://clowerlover.redirectme.net)  
+9. Сервер будет доступен по адресу: [http://malonymclaren.sytes.net/](http://malonymclaren.sytes.net/)  
 
 ## Локальное развертывание без Docker  
 
@@ -135,6 +135,5 @@ Foodgram — это платформа для публикации рецепт�
 - Для Docker: [http://localhost/api/docs/](http://localhost/api/docs/)  
 - Для локального развертывания: [http://127.0.0.1:8000/api/docs/](http://127.0.0.1:8000/api/docs/)  
 
-## Контакты  
- Email: [test.email@example.com](mailto:test.email@example.com)  
+## Контакты
  GitHub: [https://github.com/MorOrlov](https://github.com/MorOrlov)  
