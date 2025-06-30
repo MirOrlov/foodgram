@@ -288,6 +288,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """Обновляет существующий рецепт с ингредиентами и тегами."""
+        if 'image' not in validated_data:
+            validated_data['image'] = instance.image
         ingredients_data = validated_data.pop("recipe_ingredients", [])
         tags_data = validated_data.pop("tags", [])
 
