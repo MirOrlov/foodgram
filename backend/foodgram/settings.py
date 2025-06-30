@@ -143,4 +143,5 @@ MEDIA_ROOT = 'media'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CSRF_TRUSTED_ORIGINS = ['http://84.201.138.4', 'http://*']
+CSRF_TRUSTED_ORIGINS = ['https://84.201.138.4', 'https://*', 'https://malonymclaren.sytes.net/', 'http://*', 'http://84.201.138.4']
+
