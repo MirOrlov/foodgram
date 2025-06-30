@@ -13,8 +13,8 @@ from recipes.models import (
     User,
     Tag,
     Favorite,
-ShoppingCart,
-Subscription,
+    ShoppingCart,
+    Subscription,
 )
 
 
@@ -80,32 +80,33 @@ class UserSubscriptionSerializer(UserSerializer):
 
     def validate(self, data):
         """Валидация при создании подписки"""
-        user = data.get('user')
-        subscribed_to = data.get('subscribed_to')
+        user = self.context['request'].user
+        author = self.context['view'].get_object()
 
-        if user and subscribed_to and user == subscribed_to:
+        if user == author:
             raise serializers.ValidationError(
                 {'subscribed_to': 'Нельзя подписаться на самого себя'}
             )
 
-        if user and subscribed_to and Subscription.objects.filter(
-                user=user,
-                subscribed_to=subscribed_to
-        ).exists():
+        if Subscription.objects.filter(user=user, subscribed_to=author).exists():
             raise serializers.ValidationError(
                 {'subscribed_to': 'Вы уже подписаны на этого пользователя'}
             )
 
         return data
 
-class FavoriteSerializer(serializers.ModelSerializer):
-    """Сериализатор для добавления рецепта в избранное."""
+
+class FavoriteShoppingCartSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
 
     class Meta:
-        model = Favorite
         fields = ('user', 'recipe')
+
+class FavoriteSerializer(FavoriteShoppingCartSerializer):
+    """Сериализатор для добавления рецепта в избранное."""
+    class Meta(FavoriteShoppingCartSerializer.Meta):
+        model = Favorite
 
     def validate(self, data):
         """Проверяет, не добавлен ли рецепт уже в избранное."""
@@ -119,14 +120,10 @@ class FavoriteSerializer(serializers.ModelSerializer):
         return data
 
 
-class ShoppingCartSerializer(serializers.ModelSerializer):
+class ShoppingCartSerializer(FavoriteShoppingCartSerializer):
     """Сериализатор для добавления рецепта в корзину покупок."""
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
-
-    class Meta:
+    class Meta(FavoriteShoppingCartSerializer.Meta):
         model = ShoppingCart
-        fields = ('user', 'recipe')
         extra_kwargs = {
             'recipe': {'write_only': True},
             'user': {'write_only': True}

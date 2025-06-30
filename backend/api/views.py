@@ -7,6 +7,7 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import Lower
+from django.core.exceptions import ValidationError
 from rest_framework import (
     decorators,
     filters,
@@ -40,7 +41,7 @@ from api.serializers import (
     RecipeShortSerializer,
     TagSerializer,
     FavoriteSerializer,
-ShoppingCartSerializer
+    ShoppingCartSerializer
 )
 
 
@@ -142,12 +143,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def remove_from_shopping_cart(self, request, pk=None):
         return self._remove_relation(request, pk, ShoppingCart)
 
-
     @decorators.action(
-            detail=True,
-            methods=["get"],
-            url_path="get-link"
-        )
+        detail=True,
+        methods=["get"],
+        url_path="get-link"
+    )
     def link(self, request, pk=None):
         """
         Генерирует короткую ссылку на рецепт.
@@ -300,19 +300,23 @@ class UserViewSet(DjoserUserViewSet):
 
     def _create_subscription(self, user, author, request):
         """Создает подписку на пользователя"""
-        if user == author:
-            return response.Response(
-                {'errors': 'Нельзя подписаться на самого себя.'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        _, created = Subscription.objects.get_or_create(
-            user=user, subscribed_to=author
+        serializer = UserSubscriptionSerializer(
+            data={},
+            context={
+                'request': request,
+                'view': self
+            }
         )
-        if not created:
+
+        if not serializer.is_valid():
             return response.Response(
-                {'errors': f'Вы уже подписаны на пользователя {author.username}.'},
-                status=status.HTTP_400_BAD_REQUEST,
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
             )
+
+        subscription = Subscription(user=user, subscribed_to=author)
+        subscription.save()
+
         data = UserSubscriptionSerializer(
             author, context={'request': request}
         ).data
@@ -320,15 +324,17 @@ class UserViewSet(DjoserUserViewSet):
 
     def _delete_subscription(self, user, author):
         """Удаляет подписку на пользователя"""
-        subscription = Subscription.objects.filter(
-            user=user, subscribed_to=author
-        ).first()
-        if not subscription:
+        deleted_count, _ = Subscription.objects.filter(
+            user=user,
+            subscribed_to=author
+        ).delete()
+
+        if not deleted_count:
             return response.Response(
                 {'errors': 'Подписка не найдена.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        subscription.delete()
+
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 
     @decorators.action(

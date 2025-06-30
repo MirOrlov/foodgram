@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import mark_safe
-from django.db.models import Count
 
 from recipes.models import (
     User, Tag, Ingredient,
@@ -27,23 +26,13 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
-    def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        queryset = queryset.annotate(
-            _recipes_count=Count('recipes', distinct=True),
-            _subscribers_count=Count('subscribers', distinct=True),
-        )
-        return queryset
-
+    @admin.display(description='Рецепты')
     def recipes_count(self, obj):
-        return obj._recipes_count
-    recipes_count.admin_order_field = '_recipes_count'
-    recipes_count.short_description = 'Рецепты'
+        return obj.recipes.count()
 
+    @admin.display(description='Подписчики')
     def subscribers_count(self, obj):
-        return obj._subscribers_count
-    subscribers_count.admin_order_field = '_subscribers_count'
-    subscribers_count.short_description = 'Подписчики'
+        return obj.subscribers.count()
 
 
 @admin.register(Tag)
@@ -71,13 +60,7 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = ('name', 'author__username')
     list_filter = ('tags',)
     inlines = (RecipeIngredientInline,)
-
-    def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        queryset = queryset.annotate(
-            _favorites_count=Count('favorites', distinct=True),
-        )
-        return queryset
+    readonly_fields = ('image_preview',)
 
     @admin.display(description='Изображение')
     def image_preview(self, obj):
@@ -87,10 +70,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
     @admin.display(description='В избранном')
     def favorites_count(self, obj):
-        return obj._favorites_count
-    favorites_count.admin_order_field = '_favorites_count'
-
-    readonly_fields = ('image_preview',)
+        return obj.favorites.count()
 
 
 @admin.register(Subscription)
