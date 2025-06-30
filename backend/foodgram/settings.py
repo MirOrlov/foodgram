@@ -136,10 +136,6 @@ USE_TZ = True
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-ALLOWED_HOSTS = ['malonymclaren.sytes.net']
-
-CSRF_TRUSTED_ORIGINS = ['https://malonymclaren.sytes.net']
-
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
@@ -151,4 +147,9 @@ MEDIA_ROOT = "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CSRF_TRUSTED_ORIGINS = ['https://84.201.138.4', 'https://*', 'https://malonymclaren.sytes.net', 'http://*', 'http://84.201.138.4']
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20 МБ
+
+FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20 МБ
+
 
