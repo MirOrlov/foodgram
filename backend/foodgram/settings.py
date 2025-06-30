@@ -132,12 +132,6 @@ LANGUAGE_CODE = "ru-RU"
 TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
-
-CSRF_TRUSTED_ORIGINS = ["https://malonymclaren.sytes.net"]
-
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-
 USE_TZ = True
 
 
