@@ -146,7 +146,8 @@ MEDIA_ROOT = "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CSRF_TRUSTED_ORIGINS = ['https://84.201.138.4', 'https://*', 'https://malonymclaren.sytes.net', 'http://*', 'http://84.201.138.4']
+CSRF_TRUSTED_ORIGINS = ['https://84.201.138.4', 'https://*', 'https://malonymclaren.sytes.net',
+                        'http://*', 'http://84.201.138.4']
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20 МБ
 
